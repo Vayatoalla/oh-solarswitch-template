@@ -1,0 +1,96 @@
+configuration: {}
+triggers:
+  - id: "2"
+    configuration:
+      itemName: AireSiSol
+    type: core.ItemStateChangeTrigger
+conditions: []
+actions:
+  - inputs: {}
+    id: "1"
+    configuration:
+      type: application/javascript;version=ECMAScript-2021
+      script: >-
+
+        var logger = log('rules_tools.'+ruleUID);
+
+        var interruptorsolar = items.getItem("AireSiSol");
+
+        var ultimoestado = items.getItem("ControlSolarUltimoEstado");
+
+        var umbralencendido = items.getItem("UmbralEncendido").state;
+
+        var umbralapagado = items.getItem("UmbralApagado").state;
+
+        var gridpower = -items.getItem("FroniusSymoInverter_GridPower").state;
+
+        var carga = items.getItem("ACDeviceSalon_Power");
+
+
+        //Valores de ultimoestado:
+
+        //ON, JUSTON, OFF, JUSTOFF, SOLARSWITCHOFF
+
+        logger.info('Interruptorsolar '+interruptorsolar.state);
+
+        logger.info('ultimoestado '+ultimoestado.state);
+
+        logger.info('umbralencendido '+umbralencendido);
+
+        logger.info('umbralapagado '+umbralapagado);
+
+        logger.info('carga '+carga.state);
+
+        logger.info('gridpower '+gridpower);
+
+
+        if(interruptorsolar.state=='OFF') {
+          actions.NotificationAction.sendNotification("nouser@mail.account", "Solar switch off");
+          carga.sendCommandIfDifferent('OFF');
+          ultimoestado.postUpdate('SOLARSWITCHOFF');
+        }
+
+        else {
+          if(ultimoestado.state=='SOLARSWITCHOFF') {
+            logger.info('Se supone que le han dado al solar switch');
+            actions.NotificationAction.sendNotification("nouser@mail.account", "Iniciando SolarSwitch");
+            ultimoestado.postUpdate(carga.state);
+          }
+          if(ultimoestado.state=='ON') {
+            if (carga.state=='OFF') {
+              actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: Alguien apago el aire manualmente, me desactivo");
+              ultimoestado.postUpdate('SOLARSWITCHOFF');
+              interruptorsolar.sendCommand('OFF');
+            }
+            else {
+              if (gridpower<umbralapagado) {
+                carga.sendCommandIfDifferent('OFF');
+                ultimoestado.postUpdate('JUSTOFF');
+                actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: excedente solar menor que umbral, apago el aire");
+              }
+            }
+          }
+          if(ultimoestado.state=='OFF') {
+            if (carga.state=='ON') {
+              actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: Alguien encendió el aire manualmente, me desactivo");
+              ultimoestado.postUpdate('SOLARSWITCHOFF');
+              interruptorsolar.sendCommand('OFF');
+            }
+            else {
+              if (gridpower>umbralencendido) {
+                carga.sendCommandIfDifferent('ON');
+                ultimoestado.postUpdate('JUSTON');
+                actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: excedente solar superior a umbral, enciendo el aire");
+              }    
+            }
+          }  
+          if(ultimoestado.state=='JUSTON') {
+            //put here the action if juston
+            ultimoestado.postUpdate('ON');
+          }
+          if(ultimoestado.state=='JUSTOFF') {
+            //put here the action if justoff
+            ultimoestado.postUpdate('OFF');
+          }
+        }
+    type: script.ScriptAction
