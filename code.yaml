@@ -11,38 +11,22 @@ actions:
     configuration:
       type: application/javascript;version=ECMAScript-2021
       script: >-
-
         var logger = log('rules_tools.'+ruleUID);
-
         var interruptorsolar = items.getItem("AireSiSol");
-
         var ultimoestado = items.getItem("ControlSolarUltimoEstado");
-
         var umbralencendido = items.getItem("UmbralEncendido").state;
-
         var umbralapagado = items.getItem("UmbralApagado").state;
-
         var gridpower = -items.getItem("FroniusSymoInverter_GridPower").state;
-
         var carga = items.getItem("ACDeviceSalon_Power");
 
-
         //Valores de ultimoestado:
-
         //ON, JUSTON, OFF, JUSTOFF, SOLARSWITCHOFF
-
         logger.info('Interruptorsolar '+interruptorsolar.state);
-
         logger.info('ultimoestado '+ultimoestado.state);
-
         logger.info('umbralencendido '+umbralencendido);
-
         logger.info('umbralapagado '+umbralapagado);
-
         logger.info('carga '+carga.state);
-
         logger.info('gridpower '+gridpower);
-
 
         if(interruptorsolar.state=='OFF') {
           actions.NotificationAction.sendNotification("nouser@mail.account", "Solar switch off");
