@@ -2,7 +2,7 @@ configuration: {}
 triggers:
   - id: "2"
     configuration:
-      itemName: AireSiSol
+      itemName: SolarControl
     type: core.ItemStateChangeTrigger
 conditions: []
 actions:
@@ -11,70 +11,65 @@ actions:
     configuration:
       type: application/javascript;version=ECMAScript-2021
       script: >-
+	var notificationsuser = 'nouser@mail.account';
         var logger = log('rules_tools.'+ruleUID);
-        var interruptorsolar = items.getItem("AireSiSol");
-        var ultimoestado = items.getItem("ControlSolarUltimoEstado");
-        var umbralencendido = items.getItem("UmbralEncendido").state;
-        var umbralapagado = items.getItem("UmbralApagado").state;
+        var solarswitch = items.getItem("SolarControl");
+        var laststate = items.getItem("SolarControllaststate");
+        var onthreshold = items.getItem("Onthreshold").state;
+        var offthreshold = items.getItem("Offthreshold").state;
         var gridpower = -items.getItem("FroniusSymoInverter_GridPower").state;
-        var carga = items.getItem("ACDeviceSalon_Power");
+        var theload = items.getItem("ACDeviceSalon_Power");
 
-        //Valores de ultimoestado:
+        //laststate posible values:
         //ON, JUSTON, OFF, JUSTOFF, SOLARSWITCHOFF
-        logger.info('Interruptorsolar '+interruptorsolar.state);
-        logger.info('ultimoestado '+ultimoestado.state);
-        logger.info('umbralencendido '+umbralencendido);
-        logger.info('umbralapagado '+umbralapagado);
-        logger.info('carga '+carga.state);
-        logger.info('gridpower '+gridpower);
 
-        if(interruptorsolar.state=='OFF') {
-          actions.NotificationAction.sendNotification("nouser@mail.account", "Solar switch off");
-          carga.sendCommandIfDifferent('OFF');
-          ultimoestado.postUpdate('SOLARSWITCHOFF');
+        if(solarswitch.state=='OFF') {
+          if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar switch off")};
+          theload.sendCommandIfDifferent('OFF');
+          laststate.postUpdate('SOLARSWITCHOFF');
         }
 
         else {
-          if(ultimoestado.state=='SOLARSWITCHOFF') {
-            logger.info('Se supone que le han dado al solar switch');
-            actions.NotificationAction.sendNotification("nouser@mail.account", "Iniciando SolarSwitch");
-            ultimoestado.postUpdate(carga.state);
+          if(laststate.state=='SOLARSWITCHOFF') {
+            logger.info('Someone just initiated Solar Switch');
+            actions.NotificationAction.sendNotification("nouser@mail.account", "Starting SolarSwitch");
+            laststate.postUpdate(theload.state);
           }
-          if(ultimoestado.state=='ON') {
-            if (carga.state=='OFF') {
-              actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: Alguien apago el aire manualmente, me desactivo");
-              ultimoestado.postUpdate('SOLARSWITCHOFF');
-              interruptorsolar.sendCommand('OFF');
+          if(laststate.state=='ON') {
+            if (theload.state=='OFF') {
+              if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched off manually the device, deactivating the rule")};
+              laststate.postUpdate('SOLARSWITCHOFF');
+              solarswitch.sendCommand('OFF');
             }
             else {
-              if (gridpower<umbralapagado) {
-                carga.sendCommandIfDifferent('OFF');
-                ultimoestado.postUpdate('JUSTOFF');
-                actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: excedente solar menor que umbral, apago el aire");
+              if (gridpower<offthreshold) {
+                theload.sendCommandIfDifferent('OFF');
+                laststate.postUpdate('JUSTOFF');
+                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is lower than the threshold, switching off the device")};
               }
             }
           }
-          if(ultimoestado.state=='OFF') {
-            if (carga.state=='ON') {
-              actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: Alguien encendió el aire manualmente, me desactivo");
-              ultimoestado.postUpdate('SOLARSWITCHOFF');
-              interruptorsolar.sendCommand('OFF');
+          if(laststate.state=='OFF') {
+            if (theload.state=='ON') {
+              if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched on manually the device, deactivating the rule")};
+              laststate.postUpdate('SOLARSWITCHOFF');
+              solarswitch.sendCommand('OFF');
             }
             else {
-              if (gridpower>umbralencendido) {
-                carga.sendCommandIfDifferent('ON');
-                ultimoestado.postUpdate('JUSTON');
-                actions.NotificationAction.sendNotification("nouser@mail.account", "Solar Switch: excedente solar superior a umbral, enciendo el aire");
+              if (gridpower>onthreshold) {
+                theload.sendCommandIfDifferent('ON');
+                laststate.postUpdate('JUSTON');
+                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is higher than the threshold, switching on the device")};
               }    
             }
           }  
-          if(ultimoestado.state=='JUSTON') {
+          if(laststate.state=='JUSTON') {
             //put here the action if juston
-            ultimoestado.postUpdate('ON');
+            laststate.postUpdate('ON');
           }
-          if(ultimoestado.state=='JUSTOFF') {
+          if(laststate.state=='JUSTOFF') {
             //put here the action if justoff
-            ultimoestado.postUpdate('OFF');
+            laststate.postUpdate('OFF');
           }
         }
     type: script.ScriptAction
