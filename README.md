@@ -12,4 +12,6 @@ In the new Equipment you just created, add four points:
 
 
 Now we can begin with the Rules. We will need two rules.
-Rule 1 - Switch on/off depending of the power in the house and posible overules.
+
+Rule 1 - Switch on/off depending of the power in the house and posible overules. This is done with this template (oh-solarswitch).
+Rule 2 - Check the threshold periodically. This can be done with another rule. I will use the Threshold Alert and Open Reminder template.
