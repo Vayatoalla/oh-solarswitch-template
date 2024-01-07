@@ -14,4 +14,4 @@ In Configuration, Model Menu, select a location and Add one Equipment. In the ne
 
 Now we can begin with the Rules. We will need two rules.
 - Rule 1 - Switch on/off depending of the power in the house and posible overules.
-- Rule 2 - While Run rule 1 every n minutes.
+- Rule 2 - Will Run rule 1 every n minutes.
