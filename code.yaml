@@ -1,4 +1,3 @@
-configuration: {}
 triggers:
   - id: "2"
     configuration:
