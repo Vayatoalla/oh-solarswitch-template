@@ -10,7 +10,7 @@ actions:
     configuration:
       type: application/javascript;version=ECMAScript-2021
       script: >-
-	var notificationsuser = 'nouser@mail.account';
+        var notificationsuser = 'nouser@mail.account';
         var logger = log('rules_tools.'+ruleUID);
         var solarswitch = items.getItem("SolarControl");
         var laststate = items.getItem("SolarControllaststate");
