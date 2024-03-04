@@ -1,7 +1,7 @@
 # oh-solarswitch-template
 This template creates a very simple rule that will allow you to control de state of a device based on the electricity that your house is spending. I will call this device 'the load'. The goal is to have a 'Solar Switch' that switches on/off the load only when your solar panels are generating enough power.
 
-The rule should run every n minutes while the solar swith is on. This is achieve with another rule that you can create with the 'Threshold Alert and Open Reminder' template of @rlkoshak (thanks Rich).
+The rule should run every n minutes while the solar switch is on. This is achieve with another rule that you can create with the 'Threshold Alert and Open Reminder' template of @rlkoshak (thanks Rich).
 
 So, hands on, here are the steps to create the 'Solar Switch'.
 
