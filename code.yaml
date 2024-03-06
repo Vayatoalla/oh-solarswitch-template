@@ -1,6 +1,6 @@
 uid: uhm:solar_switch
 label: Solar Switch
-description: This
+description: This template creates a very simple rule that will allow you to control de state of a device 
 configDescriptions:
   - name: SolarSwitch
     type: TEXT
