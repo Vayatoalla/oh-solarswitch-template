@@ -1,7 +1,67 @@
+configDescriptions:
+  - name: SolarSwitch
+    type: TEXT
+    context: item
+    filterCriteria:
+      - name: type
+        value: Group
+    label: Group of Triggering Items
+    description: Group whose members should trigger this rule. At least SolarSwitch should be here.
+    required: true
+  - name: GridPower
+    type: TEXT
+    context: item
+    label: House Power Meter
+    description: Item that will give us the electricity that your house is spending.
+    required: true
+  - name: TheLoad
+    type: TEXT
+    context: item
+    label: Load to control
+    description: The load that this rule will control.
+    required: true
+  - name: SolarControllaststate
+    type: TEXT
+    context: item
+    filterCriteria:
+      - name: type
+        value: String
+    label: Control load if sun
+    description: Item to store the last state that was set by this rule.
+    required: true
+  - name: SwitchOnThreshold
+    type: TEXT
+    context: item
+    filterCriteria:
+      - name: type
+        value: number
+    label: Switch On Threshold
+    description: Switch that sets the threshold to switch on the load
+    required: true
+  - name: SwitchOffThreshold
+    type: TEXT
+    context: item
+    filterCriteria:
+      - name: type
+        value: number
+    label: Switch Off Threshold
+    description: Switch that sets the threshold to switch off the load
+    required: true
+  - name: NotificationUser
+    type: TEXT
+    context: item
+    filterCriteria:
+      - name: type
+        value: number
+    label: Openhab User to send change notifications
+    defaultValue: nouser@mail.account
+    description: Leave the default value if you dont want to receive an Openhab notification on changes
+    required: false
+
 triggers:
   - id: "2"
     configuration:
-      itemName: SolarControl
+      itemName: {{SolarSwitch}}
     type: core.ItemStateChangeTrigger
 conditions: []
 actions:
@@ -10,14 +70,14 @@ actions:
     configuration:
       type: application/javascript;version=ECMAScript-2021
       script: >-
-        var notificationsuser = 'nouser@mail.account';
+	var notificationsuser = '{{NotificationUser}}';
         var logger = log('rules_tools.'+ruleUID);
-        var solarswitch = items.getItem("SolarControl");
-        var laststate = items.getItem("SolarControllaststate");
-        var onthreshold = items.getItem("Onthreshold").state;
-        var offthreshold = items.getItem("Offthreshold").state;
-        var gridpower = -items.getItem("FroniusSymoInverter_GridPower").state;
-        var theload = items.getItem("ACDeviceSalon_Power");
+        var solarswitch = items.getItem("{{SolarSwitch}}");
+        var laststate = items.getItem("{{SolarControllaststate}}");
+        var onthreshold = items.getItem("{{SwitchOnThreshold}}").state;
+        var offthreshold = items.getItem("{{SwitchOffThreshold}}").state;
+        var gridpower = -items.getItem("{{GridPower}}").state;
+        var theload = items.getItem("{{TheLoad}}");
 
         //laststate posible values:
         //ON, JUSTON, OFF, JUSTOFF, SOLARSWITCHOFF
@@ -44,7 +104,7 @@ actions:
               if (gridpower<offthreshold) {
                 theload.sendCommandIfDifferent('OFF');
                 laststate.postUpdate('JUSTOFF');
-                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is lower than the threshold, switching off the device")};
+                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is lower than the off threshold, switching off the device")};
               }
             }
           }
@@ -58,7 +118,7 @@ actions:
               if (gridpower>onthreshold) {
                 theload.sendCommandIfDifferent('ON');
                 laststate.postUpdate('JUSTON');
-                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is higher than the threshold, switching on the device")};
+                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is higher than the on threshold, switching on the device")};
               }    
             }
           }  
