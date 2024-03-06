@@ -64,7 +64,7 @@ configDescriptions:
 triggers:
   - id: "2"
     configuration:
-      itemName: {{SolarSwitch}}
+      itemName: "{{SolarSwitch}}"
     type: core.ItemStateChangeTrigger
 conditions: []
 actions:
