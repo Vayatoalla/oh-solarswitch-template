@@ -73,7 +73,7 @@ actions:
     configuration:
       type: application/javascript;version=ECMAScript-2021
       script: >-
-	var notificationsuser = '{{NotificationUser}}';
+        var notificationsuser = '{{NotificationUser}}';
         var logger = log('rules_tools.'+ruleUID);
         var solarswitch = items.getItem("{{SolarSwitch}}");
         var laststate = items.getItem("{{SolarControllaststate}}");
