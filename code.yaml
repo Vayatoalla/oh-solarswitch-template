@@ -1,7 +1,7 @@
 uid: uhm:solar_switch
 label: Solar Switch
 description: This template creates a very simple rule that will allow you to control the state of a device based on the electricity that your house is spending.
-I will call this device 'the load'. The goal is to have a 'Solar Switch' that switches on/off the load only when your solar panels are generating enough power.
+             I will call this device 'the load'. The goal is to have a 'Solar Switch' that switches on/off the load only when your solar panels are generating enough power.
 configDescriptions:
   - name: SolarSwitch
     type: TEXT
