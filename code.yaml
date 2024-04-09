@@ -52,7 +52,7 @@ configDescriptions:
     required: true
   - name: NotificationUser
     type: TEXT
-    context: item
+    context: email
     filterCriteria:
       - name: type
         value: number
@@ -73,13 +73,21 @@ actions:
     configuration:
       type: application/javascript;version=ECMAScript-2021
       script: >-
+      
         var notificationsuser = '{{NotificationUser}}';
-        var logger = log('rules_tools.'+ruleUID);
+        
+        var logger = log('oh_solar_switch.'+ruleUID);
+        
         var solarswitch = items.getItem("{{SolarSwitch}}");
+        
         var laststate = items.getItem("{{SolarControllaststate}}");
+        
         var onthreshold = items.getItem("{{SwitchOnThreshold}}").state;
+        
         var offthreshold = items.getItem("{{SwitchOffThreshold}}").state;
+        
         var gridpower = -items.getItem("{{GridPower}}").state;
+        
         var theload = items.getItem("{{TheLoad}}");
 
         //laststate posible values:
