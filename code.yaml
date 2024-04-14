@@ -23,15 +23,6 @@ configDescriptions:
     label: Load to control
     description: The load that this rule will control.
     required: true
-  - name: SolarControllaststate
-    type: TEXT
-    context: item
-    filterCriteria:
-      - name: type
-        value: String
-    label: Control load if sun
-    description: Item to store the last state that was set by this rule.
-    required: true
   - name: SwitchOnThreshold
     type: TEXT
     context: item
@@ -76,11 +67,11 @@ actions:
       
         var notificationsuser = '{{NotificationUser}}';
         
-        var logger = log('oh_solar_switch.'+ruleUID);
+        var logger = log('oh_solar_sw.'+ruleUID);
         
         var solarswitch = items.getItem("{{SolarSwitch}}");
-        
-        var laststate = items.getItem("{{SolarControllaststate}}");
+
+        var laststate;
         
         var onthreshold = items.getItem("{{SwitchOnThreshold}}").state;
         
@@ -93,28 +84,39 @@ actions:
         //laststate posible values:
         //ON, JUSTON, OFF, JUSTOFF, SOLARSWITCHOFF
 
+        var LASTSTATE_KEY = ruleUID+'_laststate';
+        if (cache.private.exists(LASTSTATE_KEY)) {
+          laststate=cache.private.get(LASTSTATE_KEY);
+          logger.info('En el if del cache con ultimoestado ='+ultimoestado);
+          }
+        else {
+          laststate="SOLARSWITCHOFF";
+          cache.private.put(LASTSTATE_KEY,laststate);
+          logger.info('En el else del cache con ultimoestado = '+ultimoestado);
+          }
+
         if(solarswitch.state=='OFF') {
           if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar switch off")};
           theload.sendCommandIfDifferent('OFF');
-          laststate.postUpdate('SOLARSWITCHOFF');
+          cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
         }
 
         else {
           if(laststate.state=='SOLARSWITCHOFF') {
             logger.info('Someone just initiated Solar Switch');
             actions.NotificationAction.sendNotification("nouser@mail.account", "Starting SolarSwitch");
-            laststate.postUpdate(theload.state);
+            cache.private.put(LASTSTATE_KEY, theload.state);
           }
           if(laststate.state=='ON') {
             if (theload.state=='OFF') {
               if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched off manually the device, deactivating the rule")};
-              laststate.postUpdate('SOLARSWITCHOFF');
+              cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
               solarswitch.sendCommand('OFF');
             }
             else {
               if (gridpower<offthreshold) {
                 theload.sendCommandIfDifferent('OFF');
-                laststate.postUpdate('JUSTOFF');
+                cache.private.put(LASTSTATE_KEY, 'JUSTOFF');
                 if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is lower than the off threshold, switching off the device")};
               }
             }
@@ -122,24 +124,24 @@ actions:
           if(laststate.state=='OFF') {
             if (theload.state=='ON') {
               if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched on manually the device, deactivating the rule")};
-              laststate.postUpdate('SOLARSWITCHOFF');
+              cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
               solarswitch.sendCommand('OFF');
             }
             else {
               if (gridpower>onthreshold) {
                 theload.sendCommandIfDifferent('ON');
-                laststate.postUpdate('JUSTON');
+                cache.private.put(LASTSTATE_KEY, 'JUSTON');
                 if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is higher than the on threshold, switching on the device")};
               }    
             }
           }  
           if(laststate.state=='JUSTON') {
             //put here the action if juston
-            laststate.postUpdate('ON');
+            cache.private.put(LASTSTATE_KEY, 'ON');
           }
           if(laststate.state=='JUSTOFF') {
             //put here the action if justoff
-            laststate.postUpdate('OFF');
+            cache.private.put(LASTSTATE_KEY, 'OFF');
           }
         }
     type: script.ScriptAction
