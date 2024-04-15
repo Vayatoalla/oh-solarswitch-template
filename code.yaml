@@ -87,12 +87,12 @@ actions:
         var LASTSTATE_KEY = ruleUID+'_laststate';
         if (cache.private.exists(LASTSTATE_KEY)) {
           laststate=cache.private.get(LASTSTATE_KEY);
-          logger.info('En el if del cache con ultimoestado ='+ultimoestado);
+          logger.info('En el if del cache con ultimoestado ='+laststate);
           }
         else {
           laststate="SOLARSWITCHOFF";
           cache.private.put(LASTSTATE_KEY,laststate);
-          logger.info('En el else del cache con ultimoestado = '+ultimoestado);
+          logger.info('En el else del cache con ultimoestado = '+laststate);
           }
 
         if(solarswitch.state=='OFF') {
