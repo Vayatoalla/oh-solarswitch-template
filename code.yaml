@@ -104,7 +104,7 @@ actions:
         else {
           if(laststate.state=='SOLARSWITCHOFF') {
             logger.info('Someone just initiated Solar Switch');
-            actions.NotificationAction.sendNotification("nouser@mail.account", "Starting SolarSwitch");
+            if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar switch off")};
             cache.private.put(LASTSTATE_KEY, theload.state);
           }
           if(laststate.state=='ON') {
