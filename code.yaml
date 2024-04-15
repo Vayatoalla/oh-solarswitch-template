@@ -103,12 +103,12 @@ actions:
         }
 
         else {
-          if(laststate.state=='SOLARSWITCHOFF') {
+          if(laststate=='SOLARSWITCHOFF') {
             logger.info('Someone just initiated Solar Switch');
             if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar switch off")};
             cache.private.put(LASTSTATE_KEY, theload.state);
           }
-          if(laststate.state=='ON') {
+          if(laststate=='ON') {
             if (theload.state=='OFF') {
               if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched off manually the device, deactivating the rule")};
               cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
@@ -122,7 +122,7 @@ actions:
               }
             }
           }
-          if(laststate.state=='OFF') {
+          if(laststate=='OFF') {
             if (theload.state=='ON') {
               if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched on manually the device, deactivating the rule")};
               cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
@@ -136,11 +136,11 @@ actions:
               }    
             }
           }  
-          if(laststate.state=='JUSTON') {
+          if(laststate=='JUSTON') {
             //put here the action if juston
             cache.private.put(LASTSTATE_KEY, 'ON');
           }
-          if(laststate.state=='JUSTOFF') {
+          if(laststate=='JUSTOFF') {
             //put here the action if justoff
             cache.private.put(LASTSTATE_KEY, 'OFF');
           }
