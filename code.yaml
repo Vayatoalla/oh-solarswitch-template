@@ -85,14 +85,15 @@ actions:
         //ON, JUSTON, OFF, JUSTOFF, SOLARSWITCHOFF
 
         var LASTSTATE_KEY = ruleUID+'_laststate';
+        
         if (cache.private.exists(LASTSTATE_KEY)) {
           laststate=cache.private.get(LASTSTATE_KEY);
-          logger.info('En el if del cache con ultimoestado ='+laststate);
+          logger.info('This is the first if with latstate cache value = '+laststate);
           }
         else {
           laststate="SOLARSWITCHOFF";
           cache.private.put(LASTSTATE_KEY,laststate);
-          logger.info('En el else del cache con ultimoestado = '+laststate);
+          logger.info('This is the else with latstate cache value = '+laststate);
           }
 
         if(solarswitch.state=='OFF') {
