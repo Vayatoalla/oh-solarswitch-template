@@ -7,7 +7,7 @@ configDescriptions:
     context: item
     filterCriteria:
       - name: type
-        value: Group
+        value: Switch
     label: Group of Triggering Items
     description: Group whose members should trigger this rule. At least SolarSwitch should be here.
     required: true
@@ -44,9 +44,6 @@ configDescriptions:
   - name: NotificationUser
     type: TEXT
     context: email
-    filterCriteria:
-      - name: type
-        value: number
     label: Openhab User to send change notifications
     defaultValue: default
     description: Where to send notifications
