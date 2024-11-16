@@ -70,11 +70,11 @@ actions:
 
         var laststate;
         
-        var onthreshold = items.getItem("{{SwitchOnThreshold}}").state;
+        var onthreshold = items.getItem("{{SwitchOnThreshold}}").numericState;
         
-        var offthreshold = items.getItem("{{SwitchOffThreshold}}").state;
+        var offthreshold = items.getItem("{{SwitchOffThreshold}}").numericState;
         
-        var gridpower = items.getItem("{{GridPower}}").state;
+        var gridpower = items.getItem("{{GridPower}}").numericState;
         
         var theload = items.getItem("{{TheLoad}}");
 
