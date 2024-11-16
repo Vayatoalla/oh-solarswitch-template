@@ -15,13 +15,13 @@ configDescriptions:
     type: TEXT
     context: item
     label: House Power Meter
-    description: Item that will give us the electricity that your house is spending.
+    description: Item that will tell us the electricity that your house is spending.
     required: true
   - name: TheLoad
     type: TEXT
     context: item
     label: Load to control
-    description: The load that this rule will control.
+    description: The load switch that this rule will control.
     required: true
   - name: SwitchOnThreshold
     type: TEXT
@@ -46,7 +46,7 @@ configDescriptions:
     context: email
     label: Openhab User to send change notifications
     defaultValue: default
-    description: Where to send notifications
+    description: Where to send notifications. Leave default if you do not want to receive notifications.
     required: false
 
 triggers:
@@ -117,7 +117,7 @@ actions:
               if (gridpower>offthreshold) {
                 theload.sendCommandIfDifferent('OFF');
                 cache.private.put(LASTSTATE_KEY, 'OFF');
-                if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: solar power is lower than the off threshold, switching off the device")};
+                if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Power spending is too high, switching off the device")};
               }
             }
           }
@@ -131,7 +131,7 @@ actions:
               if (gridpower<onthreshold) {
                 theload.sendCommandIfDifferent('ON');
                 cache.private.put(LASTSTATE_KEY, 'ON');
-                if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: solar power is higher than the on threshold, switching on the device")};
+                if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Power spending is low enough, switching on the device")};
               }
             }
           }  
