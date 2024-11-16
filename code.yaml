@@ -62,7 +62,7 @@ actions:
       type: application/javascript;version=ECMAScript-2021
       script: >-
       
-        var notificationsuser = '{{NotificationUser}}';
+        var notificUser = '{{NotificationUser}}';
         
         var logger = log('oh_solar_sw.'+ruleUID);
         
@@ -82,56 +82,48 @@ actions:
 
         var LASTSTATE_KEY = ruleUID+'_laststate';
 
-
-        logger.info('UmbralEncendidoAireDormitorio = '+onthreshold);
-
-        logger.info('UmbralApagadoAireDormitorio = '+offthreshold);
-
-        logger.info('gridpower = '+gridpower);
-
+        function validEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        }
 
         if (cache.private.exists(LASTSTATE_KEY)) {
           laststate=cache.private.get(LASTSTATE_KEY);
-          logger.info('En el if del cache con ultimoestado = '+laststate);
           }
         else {
           laststate="SOLARSWITCHOFF";
           cache.private.put(LASTSTATE_KEY,laststate);
-          logger.info('En el else del cache con ultimoestado = '+laststate);
           }
 
         if(solarswitch.state=='OFF') {
-          if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar switch off")};
+          if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar switch off")};
           theload.sendCommandIfDifferent('OFF');
           cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
         }
 
         else {
           if(laststate=='SOLARSWITCHOFF') {
-            logger.info('Someone just initiated Solar Switch, and the load state is '+theload.state);
-            if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar switch on")};
+            if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar switch on")};
             cache.private.put(LASTSTATE_KEY, theload.state);
             laststate='OFF'
           }
           if(laststate=='ON') {
             if (theload.state=='OFF') {
-              if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched off manually the device, deactivating the rule")};
+              if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Someone switched off manually the device, deactivating the rule")};
               cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
               solarswitch.sendCommand('OFF');
             }
             else {
               if (gridpower>offthreshold) {
-                logger.info('Se ha ido al gridpower> con gridpower '+gridpower+ ' y offthreshold '+offthreshold);
                 theload.sendCommandIfDifferent('OFF');
                 cache.private.put(LASTSTATE_KEY, 'OFF');
-                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is lower than the off threshold, switching off the device")};
+                if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: solar power is lower than the off threshold, switching off the device")};
               }
             }
           }
           if(laststate=='OFF') {
-            logger.info('En el if del laststate con loadstate = '+theload.state);
             if (theload.state=='ON') {
-              if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: Someone switched on manually the device, deactivating the rule")};
+              if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Someone switched on manually the device, deactivating the rule")};
               cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
               solarswitch.sendCommand('OFF');
             }
@@ -139,11 +131,9 @@ actions:
               logger.info('En el else del loadstate con gripower = '+gridpower+' onthreshold = '+onthreshold);
               if (gridpower<onthreshold) {
                 theload.sendCommandIfDifferent('ON');
-                logger.info('En el if del grid< con loadstate = '+theload.state);
                 cache.private.put(LASTSTATE_KEY, 'ON');
-                if(notificationsuser != 'nouser@mail.account') {actions.NotificationAction.sendNotification(notificationsuser, "Solar Switch: solar power is higher than the on threshold, switching on the device")};
+                if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: solar power is higher than the on threshold, switching on the device")};
               }
-              else logger.info('se ha ido al else');
             }
           }  
         }
