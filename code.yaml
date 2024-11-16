@@ -30,7 +30,7 @@ configDescriptions:
       - name: type
         value: number
     label: Switch On Threshold
-    description: Switch that sets the threshold to switch on the load
+    description: Switch that sets the on threshold. If the house spends less power the rule will switch on the load.
     required: true
   - name: SwitchOffThreshold
     type: TEXT
@@ -39,7 +39,7 @@ configDescriptions:
       - name: type
         value: number
     label: Switch Off Threshold
-    description: Switch that sets the threshold to switch off the load
+    description: Switch that sets the off threshold. If the house spends more power the rule will switch off the load.
     required: true
   - name: NotificationUser
     type: TEXT
@@ -128,7 +128,6 @@ actions:
               solarswitch.sendCommand('OFF');
             }
             else {
-              logger.info('En el else del loadstate con gripower = '+gridpower+' onthreshold = '+onthreshold);
               if (gridpower<onthreshold) {
                 theload.sendCommandIfDifferent('ON');
                 cache.private.put(LASTSTATE_KEY, 'ON');
