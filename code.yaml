@@ -109,7 +109,7 @@ actions:
           }
           if(laststate=='ON') {
             if (theload.state=='OFF') {
-              if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Someone switched off manually the device, deactivating the rule")};
+              if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Someone switched off manually the device, turning off the rule")};
               cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
               solarswitch.sendCommand('OFF');
             }
@@ -123,7 +123,7 @@ actions:
           }
           if(laststate=='OFF') {
             if (theload.state=='ON') {
-              if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Someone switched on manually the device, deactivating the rule")};
+              if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar Switch: Someone switched on manually the device, turning off the rule")};
               cache.private.put(LASTSTATE_KEY, 'SOLARSWITCHOFF');
               solarswitch.sendCommand('OFF');
             }
