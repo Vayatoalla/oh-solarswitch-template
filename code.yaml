@@ -105,7 +105,7 @@ actions:
           if(laststate=='SOLARSWITCHOFF') {
             if(validEmail(notificUser)) {actions.NotificationAction.sendNotification(notificUser, "Solar switch on")};
             cache.private.put(LASTSTATE_KEY, theload.state);
-            laststate='OFF';
+            laststate=theload.state;
           }
           if(laststate=='ON') {
             if (theload.state=='OFF') {
